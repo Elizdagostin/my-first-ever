@@ -499,31 +499,63 @@
             log('WARRIOR REGISTERED: ' + name + ' ' + emoji);
 
             try {
-                const {data: existing} = await db.from('flatmates').select().eq('name', name).maybeSingle();
+                // Check if user exists
+                log('Checking for existing user...');
+                const existingResult = await db.from('flatmates').select().eq('name', name).maybeSingle();
                 
-                if (existing) {
-                    await db.from('flatmates').update({emoji}).eq('name', name);
-                    me = existing;
-                    me.emoji = emoji;
-                    log('PROFILE UPDATED');
-                } else {
-                    const {data} = await db.from('flatmates').insert([{name, emoji, points:0, streak:0}]).select().single();
-                    me = data;
-                    log('NEW WARRIOR CREATED');
+                if (existingResult.error && existingResult.error.code !== 'PGRST116') {
+                    log('ERROR: ' + existingResult.error.message);
+                    throw new Error(existingResult.error.message);
                 }
+                
+                if (existingResult.data) {
+                    // User exists, update emoji
+                    log('User exists, updating emoji...');
+                    const updateResult = await db.from('flatmates').update({emoji}).eq('name', name).select().single();
+                    
+                    if (updateResult.error) {
+                        log('ERROR: ' + updateResult.error.message);
+                        throw new Error(updateResult.error.message);
+                    }
+                    
+                    me = updateResult.data;
+                    log('✓ PROFILE UPDATED - User ID: ' + me.id);
+                } else {
+                    // Create new user
+                    log('Creating new user...');
+                    const insertResult = await db.from('flatmates').insert([{name, emoji, points:0, streak:0}]).select().single();
+                    
+                    if (insertResult.error) {
+                        log('ERROR: ' + insertResult.error.message);
+                        throw new Error(insertResult.error.message);
+                    }
+                    
+                    me = insertResult.data;
+                    log('✓ NEW WARRIOR CREATED - User ID: ' + me.id);
+                }
+                
+                log('✓ User set: ' + me.name + ' (ID: ' + me.id + ')');
 
                 document.getElementById('setup').style.display = 'none';
                 document.getElementById('intro').style.display = 'block';
                 log('LOADING QUEST INTRO...');
 
             } catch(err) {
-                log('ERROR: ' + err.message);
-                alert('ERROR: ' + err.message);
+                log('FATAL ERROR: ' + err.message);
+                alert('ERROR: ' + err.message + '\n\nPlease refresh and try again.');
             }
         }
 
         function enterParadise() {
             log('ENTERING CASA PARAÍSO');
+            log('Current user: ' + (me ? me.name + ' (ID: ' + me.id + ')' : 'NONE - ERROR!'));
+            
+            if (!me || !me.id) {
+                alert('ERROR: User not logged in. Please refresh and try again.');
+                log('CRITICAL ERROR: me object not set!');
+                return;
+            }
+            
             document.getElementById('intro').style.display = 'none';
             document.getElementById('app').style.display = 'block';
             
