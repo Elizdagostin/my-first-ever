@@ -345,6 +345,29 @@
             .btn { font-size: 0.8em; padding: 15px; }
             .story-text { font-size: 0.6em; }
         }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        @keyframes bounce {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.3); }
+        }
+        
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-10px); }
+            75% { transform: translateX(10px); }
+        }
+        
+        @keyframes confettiFall {
+            to {
+                transform: translateY(100vh) rotate(360deg);
+                opacity: 0;
+            }
+        }
     </style>
 </head>
 <body>
@@ -357,11 +380,10 @@
                 <input type="text" id="nameInput" placeholder="WARRIOR NAME" maxlength="20">
                 
                 <label>CHOOSE YOUR AVATAR:</label>
-                <input type="text" id="emojiInput" placeholder="ADD EMOJI HERE" maxlength="2" style="font-size:2em;text-align:center;">
+                <input type="text" id="emojiInput" placeholder="👤 (Optional - type emoji or leave default)" maxlength="4" style="font-size:2em;text-align:center;">
                 <div class="emoji-hint">
-                    💡 TIP: On Windows: Press Win + . (period)<br>
-                    On Mac: Press Cmd + Ctrl + Space<br>
-                    On Phone: Use emoji keyboard 😊
+                    💡 TIP: Windows: Win + . • Mac: Cmd+Ctrl+Space<br>
+                    Or just use the default 👤 warrior!
                 </div>
                 
                 <button class="btn" id="startBtn" onclick="startQuest()" disabled>
@@ -432,20 +454,47 @@
             );
             log('DATABASE CONNECTED');
 
-            // Enable start button when both fields filled
-            document.getElementById('nameInput').oninput = checkFields;
-            document.getElementById('emojiInput').oninput = checkFields;
+            // Enable start button when name field filled
+            const nameInput = document.getElementById('nameInput');
+            const emojiInput = document.getElementById('emojiInput');
+            const startBtn = document.getElementById('startBtn');
+            
+            nameInput.addEventListener('input', function() {
+                checkFields();
+            });
+            
+            emojiInput.addEventListener('input', function() {
+                checkFields();
+            });
+            
+            // Also check on keyup
+            nameInput.addEventListener('keyup', function() {
+                checkFields();
+            });
         };
 
         function checkFields() {
             const name = document.getElementById('nameInput').value.trim();
-            const emoji = document.getElementById('emojiInput').value.trim();
-            document.getElementById('startBtn').disabled = !(name && emoji);
+            const btn = document.getElementById('startBtn');
+            
+            console.log('Checking fields. Name:', name, 'Length:', name.length);
+            log('Name check: "' + name + '" (length: ' + name.length + ')');
+            
+            if (name.length > 0) {
+                btn.disabled = false;
+                btn.style.background = '#ffd700';
+                btn.style.cursor = 'pointer';
+                log('✓ BUTTON ENABLED');
+            } else {
+                btn.disabled = true;
+                btn.style.background = '#444';
+                btn.style.cursor = 'not-allowed';
+            }
         }
 
         async function startQuest() {
             const name = document.getElementById('nameInput').value.trim();
-            const emoji = document.getElementById('emojiInput').value.trim();
+            const emoji = document.getElementById('emojiInput').value.trim() || '👤';
             
             log('WARRIOR REGISTERED: ' + name + ' ' + emoji);
 
@@ -500,36 +549,192 @@
         }
 
         async function loadChores() {
-            let {data} = await db.from('chores').select();
+            if (!me || !me.id) {
+                log('ERROR: User not logged in!');
+                document.getElementById('chores').innerHTML = '<p style="text-align:center;color:#ff0000;padding:40px;">ERROR: Please restart and log in again</p>';
+                return;
+            }
             
-            const available = data.filter(c => !c.completed);
-            
-            let html = '';
-            available.forEach(c => {
-                html += '<div class="chore-card">';
-                html += '<div class="chore-header">';
-                html += '<div class="chore-title"><span class="chore-emoji">' + c.title + '</span> ' + c.description + '</div>';
-                html += '<span class="difficulty-' + c.difficulty + '">' + c.difficulty.toUpperCase() + ' • ' + c.points + 'PTS</span>';
-                html += '</div>';
-                html += '<div class="chore-meta">📍 ' + c.category + '</div>';
-                html += '<button class="btn btn-small" onclick="completeChore(\'' + c.id + '\',' + c.points + ')">✓ COMPLETE QUEST</button>';
-                html += '</div>';
-            });
-            document.getElementById('chores').innerHTML = html || '<p style="text-align:center;color:#00ff00;padding:40px;">ALL QUESTS COMPLETED! 🎉</p>';
-            log('QUESTS LOADED: ' + available.length + ' AVAILABLE');
+            try {
+                let {data, error} = await db.from('chores').select();
+                
+                if (error) {
+                    log('ERROR loading chores: ' + error.message);
+                    throw error;
+                }
+                
+                if (!data || data.length === 0) {
+                    document.getElementById('chores').innerHTML = '<p style="text-align:center;color:#ffff00;padding:40px;">NO QUESTS FOUND! Add chores to Supabase first.</p>';
+                    log('No chores in database');
+                    return;
+                }
+                
+                const available = data.filter(c => !c.completed);
+                log('Found ' + available.length + ' available quests');
+                
+                let html = '';
+                available.forEach(c => {
+                    const isMine = c.assigned_to === me.id;
+                    const isClaimed = c.assigned_to !== null && c.assigned_to !== undefined;
+                    
+                    html += '<div class="chore-card">';
+                    html += '<div class="chore-header">';
+                    html += '<div class="chore-title"><span class="chore-emoji">' + c.title + '</span> ' + c.description + '</div>';
+                    html += '<span class="difficulty-' + c.difficulty + '">' + c.difficulty.toUpperCase() + ' • ' + c.points + 'PTS</span>';
+                    html += '</div>';
+                    html += '<div class="chore-meta">📍 ' + c.category;
+                    
+                    // Show status
+                    if (isMine) {
+                        html += ' • ⚔️ YOUR QUEST';
+                    } else if (isClaimed) {
+                        html += ' • 🔒 CLAIMED';
+                    } else {
+                        html += ' • ✨ AVAILABLE';
+                    }
+                    html += '</div>';
+                    
+                    // Action buttons
+                    if (isMine) {
+                        html += '<button class="btn btn-small" onclick="completeChore(\'' + c.id + '\',' + c.points + ',\'' + c.description.replace(/'/g, "\\'") + '\')">✓ COMPLETE QUEST</button>';
+                    } else if (!isClaimed) {
+                        html += '<button class="btn btn-small" style="background:#00ffff;border-color:#008888;box-shadow:0 4px 0 #006666;" onclick="claimChore(\'' + c.id + '\')">👋 CLAIM QUEST</button>';
+                    } else {
+                        html += '<div style="padding:10px;color:#666;font-size:0.6em;text-align:center;">⏳ QUEST IN PROGRESS...</div>';
+                    }
+                    
+                    html += '</div>';
+                });
+                
+                document.getElementById('chores').innerHTML = html;
+                log('✓ ' + available.length + ' QUESTS DISPLAYED');
+                
+            } catch(err) {
+                log('ERROR: ' + err.message);
+                document.getElementById('chores').innerHTML = '<p style="text-align:center;color:#ff0000;padding:40px;">ERROR LOADING QUESTS<br>' + err.message + '</p>';
+            }
         }
 
-        async function completeChore(id, pts) {
-            await db.from('chores').update({completed:true, completed_at:new Date().toISOString(), completed_by:me.id}).eq('id',id);
-            await db.from('flatmates').update({points: me.points + pts, streak: me.streak + 1}).eq('id', me.id);
-            me.points += pts;
-            me.streak += 1;
+        async function claimChore(id) {
+            try {
+                await db.from('chores').update({assigned_to: me.id}).eq('id', id);
+                log('QUEST CLAIMED!');
+                
+                // Quick flash effect
+                document.body.style.background = '#00ffff';
+                setTimeout(() => {
+                    document.body.style.background = '#000';
+                }, 100);
+                
+                loadChores();
+            } catch(err) {
+                log('ERROR: ' + err.message);
+                alert('ERROR: ' + err.message);
+            }
+        }
+
+        async function completeChore(id, pts, description) {
+            try {
+                await db.from('chores').update({
+                    completed: true, 
+                    completed_at: new Date().toISOString(), 
+                    completed_by: me.id
+                }).eq('id', id);
+                
+                await db.from('flatmates').update({
+                    points: me.points + pts, 
+                    streak: me.streak + 1
+                }).eq('id', me.id);
+                
+                me.points += pts;
+                me.streak += 1;
+                
+                // CELEBRATION!
+                showCelebration(pts, description);
+                
+                log('QUEST COMPLETED: +' + pts + ' POINTS');
+                
+                setTimeout(() => {
+                    loadLeaderboard();
+                    loadChores();
+                }, 2000);
+                
+            } catch(err) {
+                log('ERROR: ' + err.message);
+                alert('ERROR: ' + err.message);
+            }
+        }
+
+        function showCelebration(points, questName) {
+            // Create celebration overlay
+            const overlay = document.createElement('div');
+            overlay.style.cssText = `
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: rgba(0,0,0,0.9);
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+                align-items: center;
+                z-index: 9999;
+                animation: fadeIn 0.3s;
+            `;
             
-            alert('⚔️ QUEST COMPLETE! +' + pts + ' GLORY POINTS! 🌟');
-            log('QUEST COMPLETED: +' + pts + ' POINTS');
+            // Messages based on difficulty
+            const messages = [
+                'LEGENDARY!',
+                'AMAZING!',
+                'EPIC WIN!',
+                'GLORIOUS!',
+                'UNSTOPPABLE!'
+            ];
+            const message = messages[Math.floor(Math.random() * messages.length)];
             
-            loadLeaderboard();
-            loadChores();
+            overlay.innerHTML = `
+                <div style="font-size:6em;animation:bounce 0.5s;">🏆</div>
+                <div style="font-size:3em;color:#ffd700;margin:20px 0;text-shadow:4px 4px 0 #997700;animation:pulse 1s infinite;">${message}</div>
+                <div style="font-size:2em;color:#00ff00;text-shadow:2px 2px 0 #008800;">+${points} GLORY POINTS!</div>
+                <div style="font-size:1em;color:#00ffff;margin-top:20px;max-width:80%;text-align:center;">${questName} COMPLETED!</div>
+            `;
+            
+            document.body.appendChild(overlay);
+            
+            // Create confetti
+            for (let i = 0; i < 50; i++) {
+                createConfetti();
+            }
+            
+            // Screen shake
+            document.body.style.animation = 'shake 0.5s';
+            
+            // Remove after 2 seconds
+            setTimeout(() => {
+                overlay.remove();
+                document.body.style.animation = '';
+            }, 2000);
+        }
+
+        function createConfetti() {
+            const confetti = document.createElement('div');
+            const colors = ['#ffd700', '#00ff00', '#00ffff', '#ff00ff'];
+            
+            confetti.style.cssText = `
+                position: fixed;
+                width: 10px;
+                height: 10px;
+                background: ${colors[Math.floor(Math.random() * colors.length)]};
+                left: ${Math.random() * 100}%;
+                top: -10px;
+                animation: confettiFall ${2 + Math.random() * 2}s linear;
+                z-index: 10000;
+            `;
+            
+            document.body.appendChild(confetti);
+            
+            setTimeout(() => confetti.remove(), 4000);
         }
     </script>
 </body>
