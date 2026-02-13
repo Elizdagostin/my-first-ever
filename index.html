@@ -3,1263 +3,534 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>🏠 Flatmate Chore Quest</title>
+    <title>Casa Paraíso - The Quest Begins</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        :root {
-            --pixel-pink: #FF6B9D;
-            --pixel-blue: #4ECDC4;
-            --pixel-yellow: #FFE66D;
-            --pixel-purple: #A388EE;
-            --pixel-green: #95E1D3;
-            --bg-dark: #1A1A2E;
-            --bg-light: #16213E;
-            --text-light: #EAEAEA;
-            --shadow: rgba(0, 0, 0, 0.3);
-        }
-
-        body {
-            font-family: 'Courier New', monospace;
-            background: linear-gradient(135deg, var(--bg-dark) 0%, var(--bg-light) 100%);
-            color: var(--text-light);
-            min-height: 100vh;
-            padding: 20px;
+        * { 
+            margin: 0; 
+            padding: 0; 
+            box-sizing: border-box; 
             image-rendering: pixelated;
         }
-
+        
+        body {
+            font-family: 'Press Start 2P', cursive;
+            background: #000;
+            color: #fff;
+            min-height: 100vh;
+            padding: 20px;
+            background-image: 
+                repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(255,255,255,0.03) 2px, rgba(255,255,255,0.03) 4px);
+        }
+        
         .container {
-            max-width: 1200px;
+            max-width: 800px;
             margin: 0 auto;
+            background: #1a1a2e;
+            border: 8px solid #0f3460;
+            box-shadow: 
+                0 0 0 4px #16213e,
+                0 0 40px rgba(15,52,96,0.8),
+                inset 0 0 100px rgba(0,0,0,0.5);
+            padding: 30px;
         }
-
-        .header {
+        
+        h1 {
             text-align: center;
-            margin-bottom: 40px;
-            animation: fadeInDown 0.8s ease-out;
+            color: #00ff00;
+            font-size: 1.5em;
+            margin-bottom: 20px;
+            text-shadow: 
+                4px 4px 0 #008800,
+                0 0 20px #00ff00;
+            animation: flicker 3s infinite;
+            line-height: 1.8;
         }
-
-        .header h1 {
-            font-size: 3em;
-            color: var(--pixel-yellow);
-            text-shadow: 4px 4px 0 var(--pixel-pink);
-            margin-bottom: 10px;
-            letter-spacing: 2px;
+        
+        @keyframes flicker {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.95; }
+            51% { opacity: 1; }
         }
-
-        .header p {
-            font-size: 1.2em;
-            color: var(--pixel-blue);
+        
+        .pixel-border {
+            border: 4px solid #00ff00;
+            background: #000;
+            padding: 20px;
+            margin: 20px 0;
+            box-shadow: 
+                0 0 20px rgba(0,255,0,0.3),
+                inset 0 0 20px rgba(0,255,0,0.1);
         }
-
-        /* Setup Screen */
-        .setup-screen {
-            background: rgba(255, 255, 255, 0.05);
-            border: 4px solid var(--pixel-blue);
-            border-radius: 20px;
-            padding: 40px;
-            max-width: 600px;
-            margin: 0 auto;
-            animation: fadeIn 0.5s ease-out;
-        }
-
-        .setup-screen h2 {
-            color: var(--pixel-yellow);
-            margin-bottom: 30px;
-            font-size: 2em;
-            text-align: center;
-        }
-
-        .form-group {
-            margin-bottom: 25px;
-        }
-
-        .form-group label {
+        
+        label {
             display: block;
+            color: #ffd700;
+            font-size: 0.8em;
             margin-bottom: 10px;
-            font-size: 1.1em;
-            color: var(--pixel-pink);
+            text-shadow: 2px 2px 0 #997700;
         }
-
-        .form-group input, .form-group select {
+        
+        input {
             width: 100%;
             padding: 15px;
-            font-family: 'Courier New', monospace;
-            font-size: 1em;
-            background: rgba(255, 255, 255, 0.1);
-            border: 2px solid var(--pixel-purple);
-            border-radius: 10px;
-            color: var(--text-light);
+            font-family: 'Press Start 2P', cursive;
+            font-size: 0.9em;
+            background: #000;
+            border: 4px solid #0f3460;
+            color: #00ff00;
+            margin-bottom: 20px;
+            box-shadow: inset 0 0 20px rgba(0,255,0,0.2);
         }
-
-        .avatar-builder {
-            background: rgba(255, 255, 255, 0.05);
+        
+        input:focus {
+            outline: none;
+            border-color: #00ff00;
+            box-shadow: 
+                inset 0 0 20px rgba(0,255,0,0.3),
+                0 0 20px rgba(0,255,0,0.5);
+        }
+        
+        input::placeholder {
+            color: #006600;
+        }
+        
+        .emoji-hint {
+            font-size: 0.6em;
+            color: #888;
+            margin-top: -15px;
+            margin-bottom: 20px;
+            line-height: 1.6;
+        }
+        
+        .btn {
+            width: 100%;
             padding: 20px;
-            border-radius: 10px;
-            border: 2px solid var(--pixel-green);
+            font-family: 'Press Start 2P', cursive;
+            font-size: 1em;
+            background: #ffd700;
+            color: #000;
+            border: 6px solid #ffaa00;
+            cursor: pointer;
+            position: relative;
+            box-shadow: 
+                0 6px 0 #997700,
+                0 0 30px rgba(255,215,0,0.5);
+            transition: all 0.1s;
+        }
+        
+        .btn:hover {
+            background: #ffff00;
+            box-shadow: 
+                0 6px 0 #997700,
+                0 0 40px rgba(255,255,0,0.8);
+        }
+        
+        .btn:active {
+            transform: translateY(4px);
+            box-shadow: 
+                0 2px 0 #997700,
+                0 0 20px rgba(255,215,0,0.5);
+        }
+        
+        .btn:disabled {
+            background: #444;
+            color: #666;
+            border-color: #333;
+            cursor: not-allowed;
+            box-shadow: none;
+        }
+        
+        .intro-screen {
+            display: none;
+            text-align: center;
+        }
+        
+        .intro-screen h2 {
+            font-size: 1.8em;
+            color: #ff00ff;
+            margin: 30px 0;
+            text-shadow: 
+                4px 4px 0 #880088,
+                0 0 30px #ff00ff;
+            animation: pulse 2s infinite;
+            line-height: 1.6;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+        
+        .story-text {
+            background: #000;
+            border: 4px solid #ff00ff;
+            padding: 25px;
+            margin: 30px 0;
+            font-size: 0.7em;
+            line-height: 2;
+            color: #00ffff;
+            text-shadow: 0 0 5px rgba(0,255,255,0.5);
+            text-align: left;
+        }
+        
+        .story-text p {
             margin-bottom: 20px;
         }
-
-        .avatar-preview {
-            width: 150px;
-            height: 150px;
-            margin: 0 auto 20px;
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 80px;
-            border: 3px solid var(--pixel-blue);
+        
+        .sparkle {
+            font-size: 4em;
+            animation: sparkle 1.5s infinite;
         }
-
-        .avatar-options {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
-            gap: 10px;
-            margin-top: 10px;
+        
+        @keyframes sparkle {
+            0%, 100% { transform: rotate(0deg) scale(1); }
+            25% { transform: rotate(90deg) scale(1.2); }
+            50% { transform: rotate(180deg) scale(1); }
+            75% { transform: rotate(270deg) scale(1.2); }
         }
-
-        .avatar-option {
-            padding: 10px;
-            background: rgba(255, 255, 255, 0.1);
-            border: 2px solid var(--pixel-purple);
-            border-radius: 8px;
-            cursor: pointer;
-            text-align: center;
-            transition: all 0.3s;
-            font-size: 0.9em;
-        }
-
-        .avatar-option:hover {
-            background: rgba(255, 255, 255, 0.2);
-            transform: scale(1.05);
-        }
-
-        .avatar-option.selected {
-            background: var(--pixel-green);
-            border-color: var(--pixel-yellow);
-            color: var(--bg-dark);
-        }
-
-        .btn {
-            padding: 15px 40px;
-            font-family: 'Courier New', monospace;
-            font-size: 1.2em;
-            font-weight: bold;
-            background: var(--pixel-pink);
-            color: white;
-            border: none;
-            border-radius: 10px;
-            cursor: pointer;
-            transition: all 0.3s;
-            box-shadow: 0 4px 0 #C54A6F;
-            text-transform: uppercase;
-        }
-
-        .btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 0 #C54A6F;
-        }
-
-        .btn:active {
-            transform: translateY(2px);
-            box-shadow: 0 2px 0 #C54A6F;
-        }
-
-        .btn-primary {
-            background: var(--pixel-blue);
-            box-shadow: 0 4px 0 #3A9E96;
-        }
-
-        .btn-primary:hover {
-            box-shadow: 0 6px 0 #3A9E96;
-        }
-
-        .btn-primary:active {
-            box-shadow: 0 2px 0 #3A9E96;
-        }
-
-        /* Main App */
+        
         .main-app {
             display: none;
         }
-
-        .main-app.active {
-            display: block;
-            animation: fadeIn 0.5s ease-out;
-        }
-
-        /* Dashboard Grid */
-        .dashboard {
-            display: grid;
-            grid-template-columns: 1fr 2fr;
-            gap: 20px;
-            margin-bottom: 30px;
-        }
-
-        @media (max-width: 968px) {
-            .dashboard {
-                grid-template-columns: 1fr;
-            }
-        }
-
-        /* Leaderboard */
-        .leaderboard {
-            background: rgba(255, 255, 255, 0.05);
-            border: 4px solid var(--pixel-yellow);
-            border-radius: 20px;
-            padding: 30px;
-        }
-
-        .leaderboard h2 {
-            color: var(--pixel-yellow);
-            margin-bottom: 20px;
-            font-size: 1.8em;
-            text-align: center;
-        }
-
-        .player-card {
-            background: rgba(255, 255, 255, 0.1);
+        
+        .section-title {
+            background: linear-gradient(90deg, #000 0%, #0f3460 50%, #000 100%);
+            border: 4px solid #00ff00;
             padding: 15px;
-            margin-bottom: 15px;
-            border-radius: 10px;
-            border: 3px solid var(--pixel-purple);
-            display: flex;
-            align-items: center;
+            margin: 30px 0 20px 0;
+            text-align: center;
+            font-size: 1.2em;
+            color: #00ff00;
+            text-shadow: 2px 2px 0 #008800;
+        }
+        
+        .player-card {
+            background: #000;
+            border: 4px solid #ffd700;
+            padding: 15px;
+            margin: 15px 0;
+            display: grid;
+            grid-template-columns: 50px 50px 1fr auto;
             gap: 15px;
-            transition: all 0.3s;
-            position: relative;
+            align-items: center;
+            box-shadow: 0 0 20px rgba(255,215,0,0.3);
         }
-
-        .player-card:hover {
-            transform: translateX(5px);
-            background: rgba(255, 255, 255, 0.15);
+        
+        .player-card:nth-child(1) {
+            border-color: #ffd700;
+            box-shadow: 0 0 30px rgba(255,215,0,0.6);
+            animation: winner-glow 2s infinite;
         }
-
-        .player-card.rank-1 {
-            border-color: var(--pixel-yellow);
-            background: rgba(255, 230, 109, 0.1);
+        
+        @keyframes winner-glow {
+            0%, 100% { box-shadow: 0 0 30px rgba(255,215,0,0.6); }
+            50% { box-shadow: 0 0 50px rgba(255,215,0,0.9); }
         }
-
-        .player-rank {
-            font-size: 2em;
-            font-weight: bold;
-            min-width: 40px;
+        
+        .rank {
+            font-size: 1.5em;
+            color: #ffd700;
             text-align: center;
         }
-
-        .player-avatar {
-            font-size: 50px;
-            width: 60px;
-            height: 60px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 10px;
+        
+        .avatar {
+            font-size: 2em;
+            text-align: center;
         }
-
-        .player-info {
-            flex: 1;
-        }
-
+        
         .player-name {
-            font-size: 1.3em;
-            font-weight: bold;
-            margin-bottom: 5px;
-        }
-
-        .player-stats {
-            display: flex;
-            gap: 15px;
+            color: #00ffff;
             font-size: 0.9em;
-            color: var(--pixel-green);
         }
-
-        .streak-badge {
-            display: inline-block;
-            padding: 2px 8px;
-            background: var(--pixel-pink);
-            border-radius: 5px;
-            font-size: 0.8em;
+        
+        .player-stats {
+            font-size: 0.6em;
+            color: #00ff00;
+            margin-top: 5px;
         }
-
-        /* Chores Section */
-        .chores-section {
-            background: rgba(255, 255, 255, 0.05);
-            border: 4px solid var(--pixel-blue);
-            border-radius: 20px;
-            padding: 30px;
+        
+        .points {
+            font-size: 1.2em;
+            color: #ffff00;
+            text-align: right;
         }
-
-        .chores-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-        }
-
-        .chores-header h2 {
-            color: var(--pixel-blue);
-            font-size: 1.8em;
-        }
-
-        .filter-tabs {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 20px;
-            flex-wrap: wrap;
-        }
-
-        .filter-tab {
-            padding: 10px 20px;
-            background: rgba(255, 255, 255, 0.1);
-            border: 2px solid var(--pixel-purple);
-            border-radius: 8px;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-
-        .filter-tab:hover {
-            background: rgba(255, 255, 255, 0.2);
-        }
-
-        .filter-tab.active {
-            background: var(--pixel-purple);
-            border-color: var(--pixel-yellow);
-        }
-
+        
         .chore-card {
-            background: rgba(255, 255, 255, 0.1);
+            background: #000;
+            border: 4px solid #00ffff;
             padding: 20px;
-            margin-bottom: 15px;
-            border-radius: 10px;
-            border: 3px solid var(--pixel-green);
-            transition: all 0.3s;
+            margin: 15px 0;
+            box-shadow: 0 0 20px rgba(0,255,255,0.2);
         }
-
-        .chore-card:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 8px 20px var(--shadow);
-        }
-
-        .chore-card.completed {
-            opacity: 0.6;
-            border-color: var(--pixel-yellow);
-        }
-
+        
         .chore-header {
             display: flex;
             justify-content: space-between;
-            align-items: flex-start;
-            margin-bottom: 10px;
+            align-items: center;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+            gap: 10px;
         }
-
+        
         .chore-title {
-            font-size: 1.3em;
-            font-weight: bold;
+            font-size: 0.9em;
+            color: #fff;
             display: flex;
             align-items: center;
             gap: 10px;
         }
-
+        
         .chore-emoji {
             font-size: 1.5em;
         }
-
-        .difficulty-badge {
-            padding: 5px 15px;
-            border-radius: 20px;
-            font-size: 0.9em;
-            font-weight: bold;
-            text-transform: uppercase;
-        }
-
+        
         .difficulty-easy {
-            background: var(--pixel-green);
-            color: var(--bg-dark);
+            background: #00ff00;
+            color: #000;
+            padding: 5px 10px;
+            font-size: 0.6em;
+            border: 2px solid #008800;
         }
-
+        
         .difficulty-medium {
-            background: var(--pixel-yellow);
-            color: var(--bg-dark);
+            background: #ffff00;
+            color: #000;
+            padding: 5px 10px;
+            font-size: 0.6em;
+            border: 2px solid #888800;
         }
-
+        
         .difficulty-hard {
-            background: var(--pixel-pink);
-            color: white;
+            background: #ff0000;
+            color: #fff;
+            padding: 5px 10px;
+            font-size: 0.6em;
+            border: 2px solid #880000;
         }
-
+        
         .chore-meta {
-            display: flex;
-            gap: 15px;
+            font-size: 0.6em;
+            color: #888;
             margin: 10px 0;
-            font-size: 0.9em;
-            color: var(--pixel-blue);
         }
-
-        .chore-actions {
-            display: flex;
-            gap: 10px;
-            margin-top: 15px;
-        }
-
+        
         .btn-small {
-            padding: 8px 20px;
-            font-size: 0.9em;
+            padding: 12px 20px;
+            font-size: 0.7em;
+            width: auto;
+            margin-top: 10px;
         }
-
-        /* Celebration Overlay */
-        .celebration {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.8);
-            display: none;
-            justify-content: center;
-            align-items: center;
-            z-index: 1000;
-            animation: fadeIn 0.3s;
+        
+        .debug {
+            margin-top: 30px;
+            padding: 15px;
+            background: #000;
+            border: 2px solid #333;
+            font-family: monospace;
+            font-size: 10px;
+            max-height: 200px;
+            overflow-y: auto;
+            color: #00ff00;
         }
-
-        .celebration.active {
-            display: flex;
+        
+        .log-line {
+            margin: 3px 0;
+            opacity: 0.7;
         }
-
-        .celebration-content {
-            text-align: center;
-            animation: bounceIn 0.5s;
-        }
-
-        .celebration-trophy {
-            font-size: 150px;
-            animation: spin 0.8s ease-out;
-        }
-
-        .celebration-text {
-            font-size: 3em;
-            color: var(--pixel-yellow);
-            margin: 20px 0;
-            text-shadow: 3px 3px 0 var(--pixel-pink);
-        }
-
-        .celebration-points {
-            font-size: 2em;
-            color: var(--pixel-green);
-        }
-
-        .confetti {
-            position: fixed;
-            width: 10px;
-            height: 10px;
-            background: var(--pixel-pink);
-            position: absolute;
-            animation: confettiFall 3s linear;
-        }
-
-        /* Badges */
-        .badges-section {
-            background: rgba(255, 255, 255, 0.05);
-            border: 4px solid var(--pixel-purple);
-            border-radius: 20px;
-            padding: 30px;
-            margin-top: 20px;
-        }
-
-        .badges-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-            gap: 15px;
-            margin-top: 20px;
-        }
-
-        .badge {
-            background: rgba(255, 255, 255, 0.1);
-            padding: 20px;
-            border-radius: 10px;
-            text-align: center;
-            border: 2px solid var(--pixel-purple);
-            transition: all 0.3s;
-        }
-
-        .badge:hover {
-            transform: scale(1.05);
-        }
-
-        .badge.unlocked {
-            border-color: var(--pixel-yellow);
-            background: rgba(255, 230, 109, 0.1);
-        }
-
-        .badge.locked {
-            opacity: 0.3;
-        }
-
-        .badge-icon {
-            font-size: 3em;
-            margin-bottom: 10px;
-        }
-
-        .badge-name {
-            font-weight: bold;
-            margin-bottom: 5px;
-        }
-
-        .badge-desc {
-            font-size: 0.8em;
-            color: var(--pixel-blue);
-        }
-
-        /* Animations */
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
-
-        @keyframes fadeInDown {
-            from {
-                opacity: 0;
-                transform: translateY(-20px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        @keyframes bounceIn {
-            0% { transform: scale(0); }
-            50% { transform: scale(1.2); }
-            100% { transform: scale(1); }
-        }
-
-        @keyframes spin {
-            from { transform: rotate(0deg); }
-            to { transform: rotate(360deg); }
-        }
-
-        @keyframes confettiFall {
-            to {
-                transform: translateY(100vh) rotate(360deg);
-                opacity: 0;
-            }
-        }
-
-        .hidden {
-            display: none !hidden;
-        }
-
-        /* Loading State */
-        .loading {
-            text-align: center;
-            padding: 50px;
-            font-size: 1.5em;
-            color: var(--pixel-blue);
-        }
-
-        .spinner {
-            border: 4px solid rgba(255, 255, 255, 0.1);
-            border-top: 4px solid var(--pixel-blue);
-            border-radius: 50%;
-            width: 50px;
-            height: 50px;
-            animation: spin 1s linear infinite;
-            margin: 20px auto;
+        
+        @media (max-width: 600px) {
+            h1 { font-size: 1em; }
+            .btn { font-size: 0.8em; padding: 15px; }
+            .story-text { font-size: 0.6em; }
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <div class="header">
-            <h1>🏠 FLATMATE CHORE QUEST</h1>
-            <p>Melbourne Edition - Level Up Your Cleaning Game!</p>
+        <!-- SETUP SCREEN -->
+        <div id="setup">
+            <h1>🏠 CASA PARAÍSO 🏠</h1>
+            <div class="pixel-border">
+                <label>ENTER YOUR NAME:</label>
+                <input type="text" id="nameInput" placeholder="WARRIOR NAME" maxlength="20">
+                
+                <label>CHOOSE YOUR AVATAR:</label>
+                <input type="text" id="emojiInput" placeholder="ADD EMOJI HERE" maxlength="2" style="font-size:2em;text-align:center;">
+                <div class="emoji-hint">
+                    💡 TIP: On Windows: Press Win + . (period)<br>
+                    On Mac: Press Cmd + Ctrl + Space<br>
+                    On Phone: Use emoji keyboard 😊
+                </div>
+                
+                <button class="btn" id="startBtn" onclick="startQuest()" disabled>
+                    ▶ START QUEST
+                </button>
+            </div>
         </div>
 
-        <!-- Setup Screen -->
-        <div id="setupScreen" class="setup-screen">
-            <h2>👋 Welcome! Set Up Your Profile</h2>
+        <!-- INTRO SCREEN -->
+        <div id="intro" class="intro-screen">
+            <div class="sparkle">✨</div>
             
-            <div class="form-group">
-                <label>Select Your Name:</label>
-                <select id="playerSelect">
-                    <option value="">Choose...</option>
-                    <option value="eliz">Eliz 🇧🇷</option>
-                    <option value="call">Call</option>
-                    <option value="paige">Paige 🇬🇧</option>
-                    <option value="leon">Leon 🇬🇧</option>
-                </select>
+            <h2>THE QUEST FOR<br>CASA PARAÍSO</h2>
+            
+            <div class="story-text">
+                <p>> LOADING STORY DATA...</p>
+                <p>> YEAR 2026...</p>
+                <p>> LOCATION: MELBOURNE, AUSTRALIA...</p>
+                <p style="margin-top:30px;">Long ago, in the mystical land of Melbourne, there existed a sacred dwelling known as CASA PARAÍSO - The House of Paradise.</p>
+                <p>But darkness crept in... dishes piled high like mountains, dust gathered on sacred surfaces, and chaos threatened to consume the realm.</p>
+                <p>Four brave warriors have been chosen to restore balance and reclaim the paradise that was lost.</p>
+                <p style="color:#ffd700;font-size:1.1em;margin-top:30px;">▶ WILL YOU ANSWER THE CALL?</p>
+                <p style="margin-top:30px;color:#00ff00;">
+                    • COMPLETE CHORES = GLORY POINTS 🌟<br>
+                    • BUILD STREAK = LEGENDARY STATUS 🔥<br>
+                    • CLIMB LEADERBOARD = CLAIM VICTORY 👑
+                </p>
             </div>
-
-            <div id="teamSetup" class="form-group hidden">
-                <label>Set Your Couple's Team Name:</label>
-                <input type="text" id="teamName" placeholder="e.g., Team Brazil, The Brits">
-            </div>
-
-            <div id="avatarBuilder" class="avatar-builder hidden">
-                <h3 style="color: var(--pixel-green); margin-bottom: 15px;">🎨 Create Your Avatar</h3>
-                
-                <div class="avatar-preview" id="avatarPreview">
-                    👤
-                </div>
-
-                <div class="form-group">
-                    <label>Base Character:</label>
-                    <div class="avatar-options" id="baseOptions">
-                        <div class="avatar-option" data-type="base" data-value="👨">👨 Guy 1</div>
-                        <div class="avatar-option" data-type="base" data-value="👩">👩 Gal 1</div>
-                        <div class="avatar-option" data-type="base" data-value="🧑">🧑 Person 1</div>
-                        <div class="avatar-option" data-type="base" data-value="👱">👱 Person 2</div>
-                        <div class="avatar-option" data-type="base" data-value="🧔">🧔 Guy 2</div>
-                    </div>
-                </div>
-
-                <div class="form-group">
-                    <label>Accessory:</label>
-                    <div class="avatar-options" id="accessoryOptions">
-                        <div class="avatar-option" data-type="accessory" data-value="">None</div>
-                        <div class="avatar-option" data-type="accessory" data-value="👓">👓 Glasses</div>
-                        <div class="avatar-option" data-type="accessory" data-value="🎩">🎩 Hat</div>
-                        <div class="avatar-option" data-type="accessory" data-value="🧢">🧢 Cap</div>
-                        <div class="avatar-option" data-type="accessory" data-value="👑">👑 Crown</div>
-                        <div class="avatar-option" data-type="accessory" data-value="🎧">🎧 Phones</div>
-                    </div>
-                </div>
-            </div>
-
-            <button class="btn btn-primary" id="startBtn" style="width: 100%; margin-top: 20px;" disabled>
-                🚀 Start Quest
+            
+            <button class="btn" onclick="enterParadise()">
+                ⚔️ BEGIN QUEST ⚔️
             </button>
         </div>
 
-        <!-- Main App -->
-        <div id="mainApp" class="main-app">
-            <div class="dashboard">
-                <!-- Leaderboard -->
-                <div class="leaderboard">
-                    <h2>🏆 Leaderboard</h2>
-                    <div id="leaderboardList"></div>
-                </div>
-
-                <!-- Chores -->
-                <div class="chores-section">
-                    <div class="chores-header">
-                        <h2>📋 Chores</h2>
-                        <button class="btn btn-small" id="addChoreBtn">+ Add Chore</button>
-                    </div>
-
-                    <div class="filter-tabs">
-                        <div class="filter-tab active" data-filter="available">Available</div>
-                        <div class="filter-tab" data-filter="my-chores">My Chores</div>
-                        <div class="filter-tab" data-filter="completed">Completed</div>
-                        <div class="filter-tab" data-filter="all">All</div>
-                    </div>
-
-                    <div id="choresList"></div>
-                </div>
-            </div>
-
-            <!-- Badges -->
-            <div class="badges-section">
-                <h2 style="color: var(--pixel-purple); text-align: center;">🎖️ Badges & Achievements</h2>
-                <div class="badges-grid" id="badgesList"></div>
-            </div>
+        <!-- MAIN APP -->
+        <div id="app" class="main-app">
+            <div class="section-title">🏆 HALL OF CHAMPIONS</div>
+            <div id="leaderboard"></div>
+            
+            <div class="section-title">📋 ACTIVE QUESTS</div>
+            <div id="chores"></div>
         </div>
 
-        <!-- Celebration Overlay -->
-        <div id="celebration" class="celebration">
-            <div class="celebration-content">
-                <div class="celebration-trophy">🏆</div>
-                <div class="celebration-text" id="celebrationText">AWESOME!</div>
-                <div class="celebration-points" id="celebrationPoints">+20 points</div>
-                <button class="btn" onclick="closeCelebration()">Continue</button>
-            </div>
+        <!-- DEBUG LOG -->
+        <div class="debug">
+            <strong>DEBUG LOG:</strong>
+            <div id="log"></div>
         </div>
     </div>
 
     <script>
-        // Supabase Configuration
-        const SUPABASE_URL = 'https://lxsuukvcsofxzejxpywh.supabase.co';
-        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imx4c3V1a3Zjc29meHplanhweXdoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njk0MDc1NzIsImV4cCI6MjA4NDk4MzU3Mn0._uuJEvOpZPQTmg7-tD8qZR5YygJ5sF2s3Ios-el6rXs';
-        
-        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        let db;
+        let me;
 
-        // State
-        let currentPlayer = null;
-        let allPlayers = [];
-        let allChores = [];
-        let currentFilter = 'available';
+        function log(msg) {
+            console.log(msg);
+            const logDiv = document.getElementById('log');
+            logDiv.innerHTML += '<div class="log-line">> ' + msg + '</div>';
+            logDiv.scrollTop = logDiv.scrollHeight;
+        }
 
-        // Avatar Builder State
-        let avatarData = {
-            base: '👤',
-            accessory: ''
+        window.onload = function() {
+            log('SYSTEM INITIALIZED');
+            
+            db = window.supabase.createClient(
+                'https://lxsuukvcsofxzejxpywh.supabase.co',
+                'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imx4c3V1a3Zjc29meHplanhweXdoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njk0MDc1NzIsImV4cCI6MjA4NDk4MzU3Mn0._uuJEvOpZPQTmg7-tD8qZR5YygJ5sF2s3Ios-el6rXs'
+            );
+            log('DATABASE CONNECTED');
+
+            // Enable start button when both fields filled
+            document.getElementById('nameInput').oninput = checkFields;
+            document.getElementById('emojiInput').oninput = checkFields;
         };
 
-        // Chores Data (will be pre-loaded)
-        const CHORES_DATA = [
-            // Kitchen
-            { title: "Off-load Dishwasher", emoji: "🍽️", difficulty: "easy", points: 10, category: "Kitchen", cadence_days: 1 },
-            { title: "Take out kitchen trash", emoji: "🗑️", difficulty: "easy", points: 10, category: "Kitchen", cadence_days: 7 },
-            { title: "Take out recycling trash", emoji: "🗑️", difficulty: "easy", points: 10, category: "Kitchen", cadence_days: 7 },
-            { title: "Clean Stove", emoji: "🍳", difficulty: "easy", points: 10, category: "Kitchen", cadence_days: 7 },
-            { title: "Deep Clean Kitchen", emoji: "🧽", difficulty: "hard", points: 30, category: "Kitchen", cadence_days: 14 },
-            { title: "Clean Fridge", emoji: "🧽", difficulty: "medium", points: 20, category: "Kitchen", cadence_days: 30 },
-            { title: "Brush kitchen floor", emoji: "🧹", difficulty: "easy", points: 10, category: "Kitchen", cadence_days: 3 },
-            // Bathroom
-            { title: "Clean shower", emoji: "🚿", difficulty: "hard", points: 30, category: "Bathroom", cadence_days: 30 },
-            { title: "Clean toilet", emoji: "🚽", difficulty: "medium", points: 20, category: "Bathroom", cadence_days: 14 },
-            { title: "Clean bathroom floor", emoji: "🧽", difficulty: "easy", points: 10, category: "Bathroom", cadence_days: 7 },
-            { title: "Clean bathroom counter", emoji: "🧽", difficulty: "easy", points: 10, category: "Bathroom", cadence_days: 7 },
-            // Shared Bathroom/Laundry
-            { title: "Clean laundry toilet", emoji: "🚽", difficulty: "medium", points: 20, category: "Laundry Room", cadence_days: 14 },
-            { title: "Clean laundry floor", emoji: "🧽", difficulty: "easy", points: 10, category: "Laundry Room", cadence_days: 14 },
-            { title: "Clean washing machine", emoji: "🧽", difficulty: "easy", points: 10, category: "Laundry Room", cadence_days: 30 },
-            // Common Areas
-            { title: "Vacuum living room", emoji: "🧹", difficulty: "medium", points: 20, category: "Living Room", cadence_days: 14 },
-            { title: "Vacuum couch", emoji: "🧹", difficulty: "medium", points: 20, category: "Living Room", cadence_days: 14 },
-            { title: "Water plants", emoji: "🪴", difficulty: "easy", points: 10, category: "Living Room", cadence_days: 7 },
-            { title: "Wipe surfaces", emoji: "📦", difficulty: "medium", points: 20, category: "Living Room", cadence_days: 14 },
-            { title: "Vacuum stairs", emoji: "🪜", difficulty: "medium", points: 20, category: "Living Room", cadence_days: 7 },
-            { title: "Mop floors + stairs", emoji: "💧", difficulty: "hard", points: 30, category: "Living Room", cadence_days: 30 },
-            // Bedroom
-            { title: "Vacuum bedroom", emoji: "🧹", difficulty: "medium", points: 20, category: "Bedroom", cadence_days: 14 },
-            { title: "Wipe bedside tables", emoji: "🧻", difficulty: "easy", points: 10, category: "Bedroom", cadence_days: 7 },
-            { title: "Change bedsheets", emoji: "🛌", difficulty: "easy", points: 10, category: "Bedroom", cadence_days: 14 },
-            // Laundry
-            { title: "Put wash on", emoji: "🧺", difficulty: "easy", points: 10, category: "Laundry", cadence_days: 7 },
-            { title: "Hang clothes", emoji: "🧺", difficulty: "easy", points: 10, category: "Laundry", cadence_days: 7 },
-            { title: "Fold clothes", emoji: "👔", difficulty: "easy", points: 10, category: "Laundry", cadence_days: 7 }
-        ];
+        function checkFields() {
+            const name = document.getElementById('nameInput').value.trim();
+            const emoji = document.getElementById('emojiInput').value.trim();
+            document.getElementById('startBtn').disabled = !(name && emoji);
+        }
 
-        // Badges Data
-        const BADGES_DATA = [
-            { id: 'first-blood', icon: '🏆', name: 'First Blood', description: 'Complete your first chore', requirement: 1 },
-            { id: 'on-fire', icon: '🔥', name: 'On Fire', description: '7-day streak', requirement: 7 },
-            { id: 'hero', icon: '🦸', name: 'Hero', description: 'Complete a hard chore', requirement: 1 },
-            { id: 'all-star', icon: '🌟', name: 'All-Star', description: '300 total points', requirement: 300 },
-            { id: 'aussie-battler', icon: '🦘', name: 'Aussie Battler', description: 'First week completed', requirement: 7 },
-            { id: 'flat-white-master', icon: '☕', name: 'Flat White Master', description: '10 morning chores', requirement: 10 }
-        ];
-
-        // Initialize App
-        async function initApp() {
-            console.log('Initializing app...');
+        async function startQuest() {
+            const name = document.getElementById('nameInput').value.trim();
+            const emoji = document.getElementById('emojiInput').value.trim();
             
-            // Setup event listeners
-            document.getElementById('playerSelect').addEventListener('change', handlePlayerSelect);
-            document.getElementById('startBtn').addEventListener('click', handleStartQuest);
-            
-            // Avatar builder
-            document.querySelectorAll('.avatar-option').forEach(option => {
-                option.addEventListener('click', handleAvatarOptionClick);
-            });
-
-            // Filter tabs
-            document.querySelectorAll('.filter-tab').forEach(tab => {
-                tab.addEventListener('click', handleFilterChange);
-            });
-
-            // Load initial data
-            await loadPlayers();
-            await loadChores();
-        }
-
-        // Handle Player Selection
-        function handlePlayerSelect(e) {
-            const playerName = e.target.value;
-            if (!playerName) {
-                document.getElementById('avatarBuilder').classList.add('hidden');
-                document.getElementById('teamSetup').classList.add('hidden');
-                document.getElementById('startBtn').disabled = true;
-                return;
-            }
-
-            document.getElementById('avatarBuilder').classList.remove('hidden');
-            document.getElementById('teamSetup').classList.remove('hidden');
-            document.getElementById('startBtn').disabled = false;
-        }
-
-        // Avatar Builder
-        function handleAvatarOptionClick(e) {
-            const option = e.target;
-            const type = option.dataset.type;
-            const value = option.dataset.value;
-
-            // Remove selected from siblings
-            option.parentElement.querySelectorAll('.avatar-option').forEach(opt => {
-                opt.classList.remove('selected');
-            });
-            option.classList.add('selected');
-
-            // Update avatar data
-            avatarData[type] = value;
-
-            // Update preview
-            updateAvatarPreview();
-        }
-
-        function updateAvatarPreview() {
-            const preview = document.getElementById('avatarPreview');
-            preview.textContent = avatarData.base + (avatarData.accessory || '');
-        }
-
-        // Start Quest
-        async function handleStartQuest() {
-            const playerSelect = document.getElementById('playerSelect').value;
-            const teamName = document.getElementById('teamName').value;
-            
-            if (!playerSelect) {
-                alert('Please select your name!');
-                return;
-            }
-
-            // Create or update player
-            const playerData = {
-                name: playerSelect.charAt(0).toUpperCase() + playerSelect.slice(1),
-                emoji: avatarData.base + (avatarData.accessory || ''),
-                team_name: teamName || null,
-                points: 0,
-                streak: 0
-            };
+            log('WARRIOR REGISTERED: ' + name + ' ' + emoji);
 
             try {
-                // Check if player exists
-                const { data: existingPlayer } = await supabase
-                    .from('flatmates')
-                    .select('*')
-                    .eq('name', playerData.name)
-                    .single();
-
-                if (existingPlayer) {
-                    // Update existing player
-                    const { data, error } = await supabase
-                        .from('flatmates')
-                        .update({ emoji: playerData.emoji, team_name: playerData.team_name })
-                        .eq('name', playerData.name)
-                        .select()
-                        .single();
-                    
-                    if (error) throw error;
-                    currentPlayer = data;
+                const {data: existing} = await db.from('flatmates').select().eq('name', name).maybeSingle();
+                
+                if (existing) {
+                    await db.from('flatmates').update({emoji}).eq('name', name);
+                    me = existing;
+                    me.emoji = emoji;
+                    log('PROFILE UPDATED');
                 } else {
-                    // Create new player
-                    const { data, error } = await supabase
-                        .from('flatmates')
-                        .insert([playerData])
-                        .select()
-                        .single();
-                    
-                    if (error) throw error;
-                    currentPlayer = data;
+                    const {data} = await db.from('flatmates').insert([{name, emoji, points:0, streak:0}]).select().single();
+                    me = data;
+                    log('NEW WARRIOR CREATED');
                 }
 
-                // Hide setup, show main app
-                document.getElementById('setupScreen').style.display = 'none';
-                document.getElementById('mainApp').classList.add('active');
+                document.getElementById('setup').style.display = 'none';
+                document.getElementById('intro').style.display = 'block';
+                log('LOADING QUEST INTRO...');
 
-                // Load data
-                await loadPlayers();
-                await loadChores();
-                await loadBadges();
-
-            } catch (error) {
-                console.error('Error starting quest:', error);
-                alert('Error starting quest. Please try again.');
+            } catch(err) {
+                log('ERROR: ' + err.message);
+                alert('ERROR: ' + err.message);
             }
         }
 
-        // Load Players
-        async function loadPlayers() {
-            try {
-                const { data, error } = await supabase
-                    .from('flatmates')
-                    .select('*')
-                    .order('points', { ascending: false });
-
-                if (error) throw error;
-
-                allPlayers = data || [];
-                renderLeaderboard();
-            } catch (error) {
-                console.error('Error loading players:', error);
-            }
+        function enterParadise() {
+            log('ENTERING CASA PARAÍSO');
+            document.getElementById('intro').style.display = 'none';
+            document.getElementById('app').style.display = 'block';
+            
+            loadLeaderboard();
+            loadChores();
         }
 
-        // Render Leaderboard
-        function renderLeaderboard() {
-            const list = document.getElementById('leaderboardList');
-            list.innerHTML = '';
-
-            allPlayers.forEach((player, index) => {
-                const card = document.createElement('div');
-                card.className = `player-card ${index === 0 ? 'rank-1' : ''}`;
-                
-                const rankEmoji = index === 0 ? '👑' : index === 1 ? '🥈' : index === 2 ? '🥉' : '';
-                
-                card.innerHTML = `
-                    <div class="player-rank">${rankEmoji || (index + 1)}</div>
-                    <div class="player-avatar">${player.emoji || '👤'}</div>
-                    <div class="player-info">
-                        <div class="player-name">${player.name}</div>
-                        <div class="player-stats">
-                            <span>⭐ ${player.points} pts</span>
-                            ${player.streak > 0 ? `<span class="streak-badge">🔥 ${player.streak} day streak</span>` : ''}
-                        </div>
-                        ${player.team_name ? `<div style="font-size: 0.9em; color: var(--pixel-pink); margin-top: 5px;">Team: ${player.team_name}</div>` : ''}
-                    </div>
-                `;
-                
-                list.appendChild(card);
+        async function loadLeaderboard() {
+            const {data} = await db.from('flatmates').select().order('points', {ascending:false});
+            let html = '';
+            data.forEach((p,i) => {
+                const rankIcon = i === 0 ? '👑' : i === 1 ? '🥈' : i === 2 ? '🥉' : (i+1);
+                html += '<div class="player-card">';
+                html += '<div class="rank">' + rankIcon + '</div>';
+                html += '<div class="avatar">' + (p.emoji || '👤') + '</div>';
+                html += '<div><div class="player-name">' + p.name + '</div>';
+                html += '<div class="player-stats">STREAK: ' + p.streak + ' DAYS</div></div>';
+                html += '<div class="points">' + p.points + ' PTS</div>';
+                html += '</div>';
             });
+            document.getElementById('leaderboard').innerHTML = html;
+            log('LEADERBOARD LOADED');
         }
 
-        // Load Chores
         async function loadChores() {
-            try {
-                const { data, error } = await supabase
-                    .from('chores')
-                    .select('*')
-                    .order('created_at', { ascending: false });
-
-                if (error) throw error;
-
-                // If no chores exist, create them
-                if (!data || data.length === 0) {
-                    await initializeChores();
-                    return;
-                }
-
-                allChores = data;
-                renderChores();
-            } catch (error) {
-                console.error('Error loading chores:', error);
-            }
-        }
-
-        // Initialize Chores (first time)
-        async function initializeChores() {
-            try {
-                const choresToInsert = CHORES_DATA.map(chore => ({
-                    title: chore.title,
-                    emoji: chore.emoji,
-                    difficulty: chore.difficulty,
-                    points: chore.points,
-                    category: chore.category,
-                    cadence_days: chore.cadence_days,
-                    completed: false,
-                    assigned_to: null,
-                    completed_by: null,
-                    completed_at: null
-                }));
-
-                const { data, error } = await supabase
-                    .from('chores')
-                    .insert(choresToInsert)
-                    .select();
-
-                if (error) throw error;
-
-                allChores = data;
-                renderChores();
-            } catch (error) {
-                console.error('Error initializing chores:', error);
-            }
-        }
-
-        // Render Chores
-        function renderChores() {
-            const list = document.getElementById('choresList');
-            list.innerHTML = '';
-
-            let filteredChores = allChores;
-
-            // Apply filter
-            if (currentFilter === 'available') {
-                filteredChores = allChores.filter(c => !c.completed && isChoreAvailable(c));
-            } else if (currentFilter === 'my-chores') {
-                filteredChores = allChores.filter(c => 
-                    c.assigned_to === (currentPlayer?.id) || c.completed_by === (currentPlayer?.id)
-                );
-            } else if (currentFilter === 'completed') {
-                filteredChores = allChores.filter(c => c.completed);
-            }
-
-            if (filteredChores.length === 0) {
-                list.innerHTML = '<p style="text-align: center; padding: 40px; color: var(--pixel-blue);">No chores to show! 🎉</p>';
-                return;
-            }
-
-            filteredChores.forEach(chore => {
-                const card = document.createElement('div');
-                card.className = `chore-card ${chore.completed ? 'completed' : ''}`;
-                
-                const canComplete = chore.assigned_to === currentPlayer?.id || !chore.assigned_to;
-                const isAvailable = isChoreAvailable(chore);
-                
-                card.innerHTML = `
-                    <div class="chore-header">
-                        <div class="chore-title">
-                            <span class="chore-emoji">${chore.emoji}</span>
-                            ${chore.title}
-                        </div>
-                        <span class="difficulty-badge difficulty-${chore.difficulty}">
-                            ${chore.difficulty} • ${chore.points}pts
-                        </span>
-                    </div>
-                    <div class="chore-meta">
-                        <span>📍 ${chore.category}</span>
-                        <span>🔄 Every ${chore.cadence_days} day${chore.cadence_days > 1 ? 's' : ''}</span>
-                        ${chore.assigned_to ? `<span>👤 Assigned</span>` : ''}
-                    </div>
-                    ${chore.completed ? `
-                        <div style="color: var(--pixel-green); margin-top: 10px;">
-                            ✅ Completed ${chore.completed_at ? new Date(chore.completed_at).toLocaleDateString() : ''}
-                            ${getTimeUntilAvailable(chore)}
-                        </div>
-                    ` : `
-                        <div class="chore-actions">
-                            ${canComplete && isAvailable ? `
-                                <button class="btn btn-small btn-primary" onclick="completeChore('${chore.id}')">
-                                    ✓ Complete
-                                </button>
-                            ` : isAvailable ? `
-                                <button class="btn btn-small" onclick="claimChore('${chore.id}')">
-                                    👋 Claim
-                                </button>
-                            ` : ''}
-                        </div>
-                    `}
-                `;
-                
-                list.appendChild(card);
+            let {data} = await db.from('chores').select();
+            
+            const available = data.filter(c => !c.completed);
+            
+            let html = '';
+            available.forEach(c => {
+                html += '<div class="chore-card">';
+                html += '<div class="chore-header">';
+                html += '<div class="chore-title"><span class="chore-emoji">' + c.title + '</span> ' + c.description + '</div>';
+                html += '<span class="difficulty-' + c.difficulty + '">' + c.difficulty.toUpperCase() + ' • ' + c.points + 'PTS</span>';
+                html += '</div>';
+                html += '<div class="chore-meta">📍 ' + c.category + '</div>';
+                html += '<button class="btn btn-small" onclick="completeChore(\'' + c.id + '\',' + c.points + ')">✓ COMPLETE QUEST</button>';
+                html += '</div>';
             });
+            document.getElementById('chores').innerHTML = html || '<p style="text-align:center;color:#00ff00;padding:40px;">ALL QUESTS COMPLETED! 🎉</p>';
+            log('QUESTS LOADED: ' + available.length + ' AVAILABLE');
         }
 
-        // Check if chore is available based on cadence
-        function isChoreAvailable(chore) {
-            if (!chore.completed_at) return true;
+        async function completeChore(id, pts) {
+            await db.from('chores').update({completed:true, completed_at:new Date().toISOString(), completed_by:me.id}).eq('id',id);
+            await db.from('flatmates').update({points: me.points + pts, streak: me.streak + 1}).eq('id', me.id);
+            me.points += pts;
+            me.streak += 1;
             
-            const completedDate = new Date(chore.completed_at);
-            const now = new Date();
-            const daysSinceCompleted = Math.floor((now - completedDate) / (1000 * 60 * 60 * 24));
+            alert('⚔️ QUEST COMPLETE! +' + pts + ' GLORY POINTS! 🌟');
+            log('QUEST COMPLETED: +' + pts + ' POINTS');
             
-            return daysSinceCompleted >= chore.cadence_days;
+            loadLeaderboard();
+            loadChores();
         }
-
-        // Get time until chore is available again
-        function getTimeUntilAvailable(chore) {
-            if (!chore.completed_at) return '';
-            
-            const completedDate = new Date(chore.completed_at);
-            const availableDate = new Date(completedDate);
-            availableDate.setDate(availableDate.getDate() + chore.cadence_days);
-            
-            const now = new Date();
-            const daysUntil = Math.ceil((availableDate - now) / (1000 * 60 * 60 * 24));
-            
-            if (daysUntil <= 0) {
-                return '• Available now!';
-            }
-            
-            return `• Available in ${daysUntil} day${daysUntil > 1 ? 's' : ''}`;
-        }
-
-        // Claim Chore
-        async function claimChore(choreId) {
-            if (!currentPlayer) {
-                alert('Please set up your profile first!');
-                return;
-            }
-
-            try {
-                const { data, error } = await supabase
-                    .from('chores')
-                    .update({ assigned_to: currentPlayer.id })
-                    .eq('id', choreId)
-                    .select()
-                    .single();
-
-                if (error) throw error;
-
-                await loadChores();
-            } catch (error) {
-                console.error('Error claiming chore:', error);
-                alert('Error claiming chore. Please try again.');
-            }
-        }
-
-        // Complete Chore
-        async function completeChore(choreId) {
-            if (!currentPlayer) {
-                alert('Please set up your profile first!');
-                return;
-            }
-
-            const chore = allChores.find(c => c.id === choreId);
-            if (!chore) return;
-
-            // Check if already completed today (for daily chores)
-            if (chore.cadence_days === 1 && chore.completed_at) {
-                const completedDate = new Date(chore.completed_at);
-                const today = new Date();
-                if (completedDate.toDateString() === today.toDateString()) {
-                    alert('This chore was already completed today!');
-                    return;
-                }
-            }
-
-            try {
-                // Update chore
-                const { error: choreError } = await supabase
-                    .from('chores')
-                    .update({
-                        completed: true,
-                        completed_by: currentPlayer.id,
-                        completed_at: new Date().toISOString(),
-                        assigned_to: currentPlayer.id
-                    })
-                    .eq('id', choreId);
-
-                if (choreError) throw choreError;
-
-                // Update player points and streak
-                const newPoints = currentPlayer.points + chore.points;
-                const newStreak = currentPlayer.streak + 1;
-
-                const { error: playerError } = await supabase
-                    .from('flatmates')
-                    .update({ 
-                        points: newPoints,
-                        streak: newStreak
-                    })
-                    .eq('id', currentPlayer.id);
-
-                if (playerError) throw playerError;
-
-                // Log completion
-                const { error: completionError } = await supabase
-                    .from('completions')
-                    .insert([{
-                        chore_id: choreId,
-                        flatmate_id: currentPlayer.id,
-                        points_earned: chore.points
-                    }]);
-
-                if (completionError) throw completionError;
-
-                // Show celebration
-                showCelebration(chore);
-
-                // Reload data
-                await loadPlayers();
-                await loadChores();
-
-            } catch (error) {
-                console.error('Error completing chore:', error);
-                alert('Error completing chore. Please try again.');
-            }
-        }
-
-        // Show Celebration
-        function showCelebration(chore) {
-            const messages = {
-                easy: ['NICE!', 'GOOD JOB!', 'SWEET!'],
-                medium: ['AWESOME!', 'FANTASTIC!', 'CRUSHING IT!'],
-                hard: ['LEGENDARY!', 'AMAZING!', 'EPIC WIN!']
-            };
-
-            const message = messages[chore.difficulty][Math.floor(Math.random() * messages[chore.difficulty].length)];
-            
-            document.getElementById('celebrationText').textContent = message;
-            document.getElementById('celebrationPoints').textContent = `+${chore.points} points! 🎉`;
-            document.getElementById('celebration').classList.add('active');
-
-            // Create confetti
-            for (let i = 0; i < 50; i++) {
-                createConfetti();
-            }
-
-            // Auto close after 3 seconds
-            setTimeout(() => {
-                closeCelebration();
-            }, 3000);
-        }
-
-        function createConfetti() {
-            const confetti = document.createElement('div');
-            confetti.className = 'confetti';
-            confetti.style.left = Math.random() * 100 + '%';
-            confetti.style.background = ['var(--pixel-pink)', 'var(--pixel-blue)', 'var(--pixel-yellow)', 'var(--pixel-green)'][Math.floor(Math.random() * 4)];
-            confetti.style.animationDelay = Math.random() * 0.5 + 's';
-            document.getElementById('celebration').appendChild(confetti);
-
-            setTimeout(() => confetti.remove(), 3000);
-        }
-
-        function closeCelebration() {
-            document.getElementById('celebration').classList.remove('active');
-        }
-
-        // Filter Change
-        function handleFilterChange(e) {
-            document.querySelectorAll('.filter-tab').forEach(tab => tab.classList.remove('active'));
-            e.target.classList.add('active');
-            currentFilter = e.target.dataset.filter;
-            renderChores();
-        }
-
-        // Load Badges
-        async function loadBadges() {
-            renderBadges();
-        }
-
-        function renderBadges() {
-            const list = document.getElementById('badgesList');
-            list.innerHTML = '';
-
-            BADGES_DATA.forEach(badge => {
-                const unlocked = checkBadgeUnlocked(badge);
-                
-                const card = document.createElement('div');
-                card.className = `badge ${unlocked ? 'unlocked' : 'locked'}`;
-                
-                card.innerHTML = `
-                    <div class="badge-icon">${badge.icon}</div>
-                    <div class="badge-name">${badge.name}</div>
-                    <div class="badge-desc">${badge.description}</div>
-                `;
-                
-                list.appendChild(card);
-            });
-        }
-
-        function checkBadgeUnlocked(badge) {
-            if (!currentPlayer) return false;
-
-            switch(badge.id) {
-                case 'first-blood':
-                    return currentPlayer.points > 0;
-                case 'on-fire':
-                    return currentPlayer.streak >= 7;
-                case 'all-star':
-                    return currentPlayer.points >= 300;
-                case 'aussie-battler':
-                    return currentPlayer.streak >= 7;
-                default:
-                    return false;
-            }
-        }
-
-        // Initialize on load
-        document.addEventListener('DOMContentLoaded', initApp);
     </script>
 </body>
 </html>
